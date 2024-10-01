@@ -1,0 +1,1 @@
+# bidding_server_application
