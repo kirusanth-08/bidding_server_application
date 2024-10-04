@@ -7,6 +7,8 @@ const morgan = require('morgan');
 const hpp = require('hpp'); // HTTP Parameter Pollution prevention
 const mongoose = require('mongoose');
 
+const locationsController = require('./controllers/locationsController');
+
 const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const errorHandler = require('./middlewares/errorHandler');
@@ -35,7 +37,9 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 });
 
 // Routes
-app.use('/api/users', userRoutes);
-app.use('/api/items', itemRoutes);
+app.get('/api/locations', locationsController.getAllLocations);
+
+app.use('/api/users/v1', userRoutes);
+app.use('/api/items/v1', itemRoutes);
 
 app.use(errorHandler);
