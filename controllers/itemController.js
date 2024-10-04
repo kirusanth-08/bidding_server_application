@@ -6,11 +6,7 @@ const path = require('path');
 
 const addItem = (req, res) => {
   try {
-    // Validate the request body first before uploading images
-    if (!req.body.name || !req.body.price || !req.body.description || !req.body.location || !req.body.type || !req.body.condition || !req.body.userId) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
+   
     // Validate that startingBid is required if the item is for bidding
     if (req.body.sellingType === 'Bid' && !req.body.startingBid) {
       return res.status(400).json({ message: 'Starting Bid is required for bid items' });
