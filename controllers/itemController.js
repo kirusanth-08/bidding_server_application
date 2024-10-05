@@ -1,28 +1,39 @@
-const express = require('express');
-const mongoose = require('mongoose');
 const Item = require('../models/Item');
 const multer = require('multer');
 const path = require('path');
 
-const addItem = (req, res) => {
+const postItem = (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: 'Image upload failed', error: err.message });
+    }
+    const imagePaths = req.files.map(file => file.path);
+
+    try {
+      const newItem = new Item({
+        ...req.body,
+        images: imagePaths
+      });
+      await newItem.save();
+      res.status(201).json(newItem);
+    } catch (error) {
+      res.status(400).json({ message: 'Error saving item', error: error.message });
+    }
+  });
+};
+
+const postBidItem = (req, res) => {
   try {
-   
-    // Validate that startingBid is required if the item is for bidding
     if (req.body.sellingType === 'Bid' && !req.body.startingBid) {
       return res.status(400).json({ message: 'Starting Bid is required for bid items' });
     }
-
-    // Now that all validations are successful, use multer to handle the image upload
     upload(req, res, async (err) => {
       if (err) {
         return res.status(400).json({ message: 'Image upload failed', error: err.message });
       }
-
-      // Get the paths of the uploaded images
       const imagePaths = req.files.map(file => file.path);
 
       try {
-        // Create a new item with the validated data and uploaded images
         const newItem = new Item({
           name: req.body.name,
           price: req.body.price,
@@ -30,17 +41,15 @@ const addItem = (req, res) => {
           location: req.body.location,
           type: req.body.type,
           condition: req.body.condition,
-          userId: req.body.userId, // Assuming userId is passed in the request
-          images: imagePaths,      // Save image paths to the DB
+          userId: req.body.userId, 
+          images: imagePaths,
           sellingType: req.body.sellingType,
           startingBid: req.body.startingBid,
           bidEndTime: req.body.bidEndTime
         });
 
-        // Save the new item to the database
         const savedItem = await newItem.save();
 
-        // Send response back with the saved item
         res.status(201).json({
           message: 'Item created successfully',
           item: savedItem
@@ -162,7 +171,8 @@ const upload = multer({
 
 
 module.exports = {
-  addItem,
+  postItem,
+  postBidItem,
   getItems,
   getItemById,
   updateItem,
