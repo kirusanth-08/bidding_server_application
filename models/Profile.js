@@ -13,6 +13,24 @@ const profileSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true
+  },
+  notificationPreferences: {
+    biddingNotifications: {
+      type: Boolean,
+      default: true
+    },
+    newItemsNotifications: {
+      type: Boolean,
+      default: true
+    },
+    messageFromSellers: {
+      type: Boolean,
+      default: true
+    },
+    bidStatus: {
+      type: Boolean,
+      default: true
+    }
   }
 });
 

@@ -2,7 +2,27 @@ const Item = require('../models/Item');
 const multer = require('multer');
 const path = require('path');
 
-const addItem = (req, res) => {
+const postItem = (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: 'Image upload failed', error: err.message });
+    }
+    const imagePaths = req.files.map(file => file.path);
+
+    try {
+      const newItem = new Item({
+        ...req.body,
+        images: imagePaths
+      });
+      await newItem.save();
+      res.status(201).json(newItem);
+    } catch (error) {
+      res.status(400).json({ message: 'Error saving item', error: error.message });
+    }
+  });
+};
+
+const postBidItem = (req, res) => {
   try {
     if (req.body.sellingType === 'Bid' && !req.body.startingBid) {
       return res.status(400).json({ message: 'Starting Bid is required for bid items' });
@@ -151,7 +171,8 @@ const upload = multer({
 
 
 module.exports = {
-  addItem,
+  postItem,
+  postBidItem,
   getItems,
   getItemById,
   updateItem,

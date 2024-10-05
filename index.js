@@ -11,6 +11,7 @@ const locationsController = require('./controllers/locationsController');
 
 const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -41,5 +42,6 @@ app.get('/api/locations', locationsController.getAllLocations);
 
 app.use('/api/users/v1', userRoutes);
 app.use('/api/items/v1', itemRoutes);
+app.use('/api/profile/v1', profileRoutes);
 
 app.use(errorHandler);
