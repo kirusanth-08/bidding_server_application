@@ -12,6 +12,8 @@ const locationsController = require('./controllers/locationsController');
 const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const mailRoutes = require('./routes/mailRoutes');
+const bidRoutes = require('./routes/bidRoute');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -43,5 +45,7 @@ app.get('/api/locations/v1', locationsController.getAllLocations);
 app.use('/api/users/v1', userRoutes);
 app.use('/api/items/v1', itemRoutes);
 app.use('/api/profile/v1', profileRoutes);
+app.use('/api/mail/v1', mailRoutes);
+app.use('/api/bid/v1', bidRoutes);
 
 app.use(errorHandler);
