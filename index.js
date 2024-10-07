@@ -38,7 +38,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 });
 
 // Routes
-app.get('/api/locations', locationsController.getAllLocations);
+app.get('/api/locations/v1', locationsController.getAllLocations);
 
 app.use('/api/users/v1', userRoutes);
 app.use('/api/items/v1', itemRoutes);

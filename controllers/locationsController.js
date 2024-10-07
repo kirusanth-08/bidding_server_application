@@ -1,20 +1,43 @@
-const Location = require('../models/Locations'); // Adjust the path as necessary
+// controllers/provinceController.js
+const Location = require('../models/locations');
 
-// Controller to get all locations with populated districts and sublocations
 const getAllLocations = async (req, res) => {
   try {
-    const locations = await Location.find().populate({
-      path: 'districts',
-      populate: {
-        path: 'sublocations'
-      }
+    // Retrieve all provinces
+    const provinces = await Location.find({ type: 'Province' });
+
+    // Populate districts and their sub-locations
+    const populatedProvinces = await Promise.all(
+      provinces.map(async (province) => {
+        const districts = await Location.find({ parent: province._id, type: 'District' });
+        const populatedDistricts = await Promise.all(
+          districts.map(async (district) => {
+            const subLocations = await Location.find({ parent: district._id, type: 'Sublocation' });
+            return {
+              ...district.toObject(),
+              subLocations,
+            };
+          })
+        );
+        return {
+          ...province.toObject(),
+          districts: populatedDistricts,
+        };
+      })
+    );
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      data: populatedProvinces,
     });
-    res.json(locations);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching locations' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+    });
   }
 };
 
-module.exports = {
-  getAllLocations
-};
+module.exports = { getAllLocations };
