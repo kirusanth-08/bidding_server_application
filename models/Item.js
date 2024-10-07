@@ -53,6 +53,10 @@ const itemSchema = new mongoose.Schema({
   },
   bidEndTime: {
     type: Date
+  },
+  sold: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 
