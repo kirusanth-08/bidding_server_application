@@ -4,7 +4,8 @@ const Bidding = require('../models/Bidding');
 // Place a bid
 const placeBid = async (req, res) => {
   try {
-    const { itemId, userId, bidPrice } = req.body;
+    const {userId, bidPrice } = req.body;
+    const {itemId} = req.params;
 
     // Find the item being bid on
     const item = await Item.findById(itemId);
@@ -95,7 +96,7 @@ const closeAuction = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
 
-    item.bidEndTime = new Date(); // Manually set the end time to now
+    item.sold='true'; // Manually set the end time to now
     await item.save();
 
     res.status(200).json({ message: 'Auction closed successfully' });
