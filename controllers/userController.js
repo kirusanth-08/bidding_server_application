@@ -12,7 +12,7 @@ const register = async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).send({ message: 'User registered successfully', token });
+    res.status(201).send({ message: 'User registered successfully', token, userId: user._id });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
@@ -30,7 +30,7 @@ const login = async (req, res) => {
       return res.status(400).send({ error: 'Invalid email or password' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET); // Use JWT secret from .env
-    res.send({ token });
+    res.send({ token, userId: user._id });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
