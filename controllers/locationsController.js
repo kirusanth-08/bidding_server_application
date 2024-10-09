@@ -1,5 +1,5 @@
 // controllers/provinceController.js
-const Location = require('../models/locations');
+const Location = require('../models/Locations');
 
 const getAllLocations = async (req, res) => {
   try {
