@@ -9,7 +9,10 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, phoneNumber, password: hashedPassword });
     await user.save();
-    res.status(201).send({ message: 'User registered successfully' });
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.status(201).send({ message: 'User registered successfully', token });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
