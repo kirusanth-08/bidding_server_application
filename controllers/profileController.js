@@ -1,4 +1,3 @@
-const { get } = require('mongoose');
 const Profile = require('../models/Profile');
 
 const getProfileDetails = async (req, res) => {

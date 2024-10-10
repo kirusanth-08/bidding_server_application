@@ -5,14 +5,14 @@ require('dotenv').config();
 
 const register = async (req, res) => {
   try {
-    const { email, phoneNumber, password } = req.body;
+    const { name, email, phoneNumber, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, phoneNumber, password: hashedPassword });
+    const user = new User({ name, email, phoneNumber, password: hashedPassword });
     await user.save();
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).send({ message: 'User registered successfully', token, userId: user._id });
+    res.status(201).send({ message: 'User registered successfully', token, userId: user._id, username: user.name });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
@@ -23,14 +23,14 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).send({ error: 'Invalid email or password' });
+      return res.status(400).send({ error: 'User not found!' });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).send({ error: 'Invalid email or password' });
+      return res.status(400).send({ error: 'Invalid password' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET); // Use JWT secret from .env
-    res.send({ token, userId: user._id });
+    res.send({ token, userId: user._id, username: user.name });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }
@@ -82,7 +82,8 @@ const validateToken = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.id, 'tokens.token': token });
+    const user = await User.findOne({ _id: decoded.userId });
+    // console.log(token, decoded, user) 
 
     if (!user) {
       throw new Error();

@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const hpp = require('hpp'); // HTTP Parameter Pollution prevention
 const mongoose = require('mongoose');
+const path = require('path');
 
 const locationsController = require('./controllers/locationsController');
 
@@ -38,6 +39,8 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 }).catch((error) => {
   console.error('Error connecting to MongoDB:', error.message);
 });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.get('/api/locations/v1', locationsController.getAllLocations);
