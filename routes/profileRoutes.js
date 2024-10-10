@@ -3,7 +3,7 @@ const profileController = require('../controllers/profileController'); // Adjust
 
 const router = express.Router();
 
-
+router.post('/get-profile', profileController.getProfileDetails);
 router.put('/address', profileController.updateAddress);
 router.put('/notification-preferences', profileController.updateNotificationPreferences);
 router.put('/name', profileController.updateName);

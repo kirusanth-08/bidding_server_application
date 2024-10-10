@@ -1,4 +1,21 @@
+const { get } = require('mongoose');
 const Profile = require('../models/Profile');
+
+const getProfileDetails = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const profile = await Profile.findOne({ userId });
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving profile', error: error.message });
+  }
+};
 
 // Update address
 const updateAddress = async (req, res) => {
@@ -63,7 +80,10 @@ const updateName = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
+  getProfileDetails,
   updateAddress,
   updateNotificationPreferences,
   updateName

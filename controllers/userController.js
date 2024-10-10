@@ -77,7 +77,26 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+const validateToken = async (req, res) => {
+  const token = req.header('Authorization').replace('Bearer ', '');
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ _id: decoded.id, 'tokens.token': token });
+
+    if (!user) {
+      throw new Error();
+    }
+
+    res.status(200).json({ valid: true });
+  } catch (error) {
+    console.log(error)
+    res.status(401).json({ valid: false, message: 'Token is invalid or expired' });
+  }
+};
+
 module.exports = {
+  validateToken,
   register,
   login,
   updatePassword,
