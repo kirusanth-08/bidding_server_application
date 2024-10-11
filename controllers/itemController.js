@@ -146,7 +146,7 @@ const getItemsBySeller = async (req, res) => {
 // Get item by ID
 const getItemById = async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id).populate("bid");
+    const item = await Item.findById(req.params.id).populate("location").populate("userId");
     if (!item) {
       return res.status(404).send({ error: "Item not found" });
     }
