@@ -131,7 +131,6 @@ const identifyHighestBidder = async () => {
   try {
     const currentTime = new Date();
     console.log("Checking for expired auctions...");
-    console.log("Current time:", currentTime);
 
     // Fetch all items where the bidding time has ended and the item is not sold yet
     const expiredAuctions = await Item.find({
@@ -168,7 +167,7 @@ const identifyHighestBidder = async () => {
           <p>Phone: ${seller.phoneNumber}</p>
           <br><br>
           <p>Thank you for using our marketplace!</p>
-          <p>Best regards,<br>Your Marketplace Team</p>
+          <p>Best regards,<br>Your BidBazzar Team</p>
         `;
 
         // Send an email to the highest bidder
