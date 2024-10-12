@@ -1,5 +1,7 @@
 const Item = require('../models/Item');
 const Bidding = require('../models/Bidding');
+const nodemailer = require('nodemailer');
+const User = require('../models/User');
 
 // Place a bid
 const placeBid = async (req, res) => {
@@ -101,6 +103,99 @@ const getRemainingTime = async (req, res) => {
     res.status(500).json({ message: 'Error fetching remaining time', error: error.message });
   }
 };
+
+const sendEmail = async (recipientEmail, subject, htmlContent) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "mall360shoppy@gmail.com",
+      pass: "bhdn dfjx yrmt wukf",
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  const mailOptions = {
+    from: "mall360shoppy@gmail.com",
+    to: recipientEmail,
+    subject: subject,
+    html: htmlContent,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Main function to identify the highest bidder and send notification
+const identifyHighestBidder = async () => {
+  try {
+    const currentTime = new Date();
+    console.log("Checking for expired auctions...");
+
+    // Fetch all items where the bidding time has ended and the item is not sold yet
+    const expiredAuctions = await Item.find({
+      bidEndTime: { $lte: currentTime },
+      sold: false,
+    });
+
+    // Iterate through each expired auction
+    for (const item of expiredAuctions) {
+      // Fetch all bids associated with the item
+      const bids = await Bidding.find({ itemId: item._id }).sort({ bidPrice: -1 });
+
+      if (bids.length > 0) {
+        const highestBid = bids[0]; // The first bid is the highest because of the descending sort
+
+        // Mark the item as sold and update the current bid
+        item.currentBid = highestBid.bidPrice;
+        item.sold = true;
+        await item.save();
+
+        // Populate the user details of the highest bidder
+        const highestBidder = await User.findById(highestBid.userId);
+        const seller = await User.findById(item.userId);
+
+        // Prepare the email content
+        const htmlContent = `
+          <h1>Congratulations, ${highestBidder.name}!</h1>
+          <p>You have won the auction for the item: <strong>${item.name}</strong>.</p>
+          <p>Your winning bid was: <strong>$${highestBid.bidPrice.toFixed(2)}</strong>.</p>
+          <p>Please proceed to complete the purchase by clicking the link below:</p>
+          <p>To complete your purchase</p>
+          <p>Contact Seller : ${seller.name}</p>
+          <p>Email: ${seller.email}</p>
+          <p>Phone: ${seller.phoneNumber}</p>
+          <br><br>
+          <p>Thank you for using our marketplace!</p>
+          <p>Best regards,<br>Your BidBazzar Team</p>
+        `;
+
+        // Send an email to the highest bidder
+        await sendEmail(
+          highestBidder.email,
+          'Congratulations! You won the auction',
+          htmlContent
+        );
+
+        console.log(`Auction for item "${item.name}" has ended. Highest bidder: ${highestBidder.name}, Bid: ${highestBid.bidPrice}`);
+      } else {
+        // If no bids were placed, just mark the item as sold
+        item.sold = true;
+        await item.save();
+
+        console.log(`Auction for item "${item.name}" has ended with no bids.`);
+      }
+    }
+  } catch (error) {
+    console.error('Error identifying the highest bidder:', error);
+  }
+};
+
+// Set an interval to check for expired auctions every 10 seconds
+setInterval(() => {
+  identifyHighestBidder();
+}, 10000);
+ 
 
 
 
