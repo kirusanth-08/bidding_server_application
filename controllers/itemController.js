@@ -56,8 +56,12 @@ const addItem = (req, res) => {
       imagePaths = req.body.images;
     }
 
+    const capitalizeFirstLetter = (string) => {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    };
+
     try {
-      const locationObj = await Location.findOne({ name: req.body.location });
+      const locationObj = await Location.findOne({ name: capitalizeFirstLetter(req.body.location) });
       console.log(locationObj);
       let bidEnd;
 
